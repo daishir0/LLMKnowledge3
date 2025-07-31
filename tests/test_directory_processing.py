@@ -25,7 +25,7 @@ class DirectoryProcessingTester:
         """Authenticate as admin user"""
         try:
             response = self.session.post(f"{self.base_url}/auth/login", data={
-                "username": "admin@example.com",
+                "username": "admin",
                 "password": "admin123"
             })
             if response.status_code == 200:
@@ -84,7 +84,7 @@ class DirectoryProcessingTester:
                 "description": f"Recursive security assessment of all files in {directory_path}"
             })
             
-            if response.status_code != 201:
+            if response.status_code not in [200, 201]:
                 logger.error(f"Failed to create group: {response.status_code}")
                 return False
             
@@ -106,8 +106,13 @@ class DirectoryProcessingTester:
                     "content": content,
                     "category": category
                 })
-                if response.status_code == 201:
-                    prompt_ids.append(response.json()["id"])
+                if response.status_code in [200, 201]:
+                    prompt_id = response.json()["id"]
+                    prompt_ids.append(prompt_id)
+                    
+                    assoc_response = self.session.post(f"{self.base_url}/groups/{group_id}/prompts/{prompt_id}")
+                    if assoc_response.status_code not in [200, 201]:
+                        logger.warning(f"Failed to associate prompt {prompt_id} with group {group_id}: {assoc_response.status_code}")
             
             processed_files = 0
             for root, dirs, files in os.walk(directory_path):
@@ -126,7 +131,7 @@ class DirectoryProcessingTester:
                             "file_type": "text"
                         })
                         
-                        if response.status_code == 201:
+                        if response.status_code in [200, 201]:
                             processed_files += 1
                             logger.info(f"Processed file: {relative_path}")
                         else:
@@ -137,17 +142,14 @@ class DirectoryProcessingTester:
             
             logger.info(f"Processed {processed_files} files from directory")
             
-            response = self.session.post(f"{self.base_url}/tasks", json={
-                "group_id": group_id,
-                "prompt_ids": prompt_ids
-            })
+            response = self.session.post(f"{self.base_url}/tasks/bulk/group/{group_id}")
             
-            if response.status_code != 201:
+            if response.status_code not in [200, 201]:
                 logger.error(f"Failed to create task: {response.status_code}")
                 return False
             
-            task_id = response.json()["id"]
-            logger.info(f"Created task with ID: {task_id}")
+            result = response.json()
+            logger.info(f"Created bulk tasks for group {group_id}: {result['message']}")
             
             import time
             max_wait = 600  # 10 minutes for directory processing
@@ -175,7 +177,7 @@ class DirectoryProcessingTester:
                 matrix = response.json()
                 logger.info(f"Generated knowledge matrix with {matrix['total_count']} items")
                 
-                response = self.session.get(f"{self.base_url}/matrix/export", params={"group_id": group_id})
+                response = self.session.get(f"{self.base_url}/matrix/export/excel", params={"group_id": group_id})
                 if response.status_code == 200:
                     filename = f"directory_security_scan_{int(time.time())}.xlsx"
                     with open(filename, 'wb') as f:

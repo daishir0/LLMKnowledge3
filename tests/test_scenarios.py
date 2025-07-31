@@ -28,7 +28,7 @@ class LLMKnowledge3Tester:
         """Authenticate as admin user"""
         try:
             response = self.session.post(f"{self.base_url}/auth/login", data={
-                "username": "admin@example.com",
+                "username": "admin",
                 "password": "admin123"
             })
             if response.status_code == 200:
@@ -47,16 +47,16 @@ class LLMKnowledge3Tester:
         """Create a test user and return their token"""
         try:
             response = self.session.post(f"{self.base_url}/auth/register", json={
+                "username": email.split('@')[0],
                 "email": email,
-                "password": password,
-                "full_name": f"Test User {email.split('@')[0]}"
+                "password": password
             })
             
             if response.status_code != 201:
                 logger.warning(f"User registration failed for {email}: {response.status_code}")
             
             response = self.session.post(f"{self.base_url}/auth/login", data={
-                "username": email,
+                "username": email.split('@')[0],
                 "password": password
             })
             
@@ -86,7 +86,7 @@ class LLMKnowledge3Tester:
                 "name": name,
                 "description": description
             })
-            if response.status_code == 201:
+            if response.status_code in [200, 201]:
                 group_id = response.json()["id"]
                 logger.info(f"Created group '{name}' with ID {group_id}")
                 return group_id
@@ -105,7 +105,7 @@ class LLMKnowledge3Tester:
                 "content": content,
                 "category": category
             })
-            if response.status_code == 201:
+            if response.status_code in [200, 201]:
                 prompt_id = response.json()["id"]
                 logger.info(f"Created prompt '{name}' with ID {prompt_id}")
                 return prompt_id
@@ -125,7 +125,7 @@ class LLMKnowledge3Tester:
                 "content": content,
                 "file_type": "text"
             })
-            if response.status_code == 201:
+            if response.status_code in [200, 201]:
                 record_id = response.json()["id"]
                 logger.info(f"Created record '{title}' with ID {record_id}")
                 return record_id
@@ -136,23 +136,25 @@ class LLMKnowledge3Tester:
             logger.error(f"Record creation error: {e}")
             return None
     
-    def create_task(self, group_id: int, prompt_ids: List[int]) -> int:
-        """Create a task and return its ID"""
+    def create_task(self, group_id: int, prompt_ids: List[int]) -> bool:
+        """Create bulk tasks for group and return success status"""
         try:
-            response = self.session.post(f"{self.base_url}/tasks", json={
-                "group_id": group_id,
-                "prompt_ids": prompt_ids
-            })
-            if response.status_code == 201:
-                task_id = response.json()["id"]
-                logger.info(f"Created task with ID {task_id}")
-                return task_id
+            for prompt_id in prompt_ids:
+                response = self.session.post(f"{self.base_url}/groups/{group_id}/prompts/{prompt_id}")
+                if response.status_code not in [200, 201]:
+                    logger.warning(f"Failed to associate prompt {prompt_id} with group {group_id}: {response.status_code}")
+            
+            response = self.session.post(f"{self.base_url}/tasks/bulk/group/{group_id}")
+            if response.status_code in [200, 201]:
+                result = response.json()
+                logger.info(f"Created bulk tasks for group {group_id}: {result.get('message', 'Success')}")
+                return True
             else:
-                logger.error(f"Task creation failed: {response.status_code} - {response.text}")
-                return None
+                logger.error(f"Bulk task creation failed: {response.status_code} - {response.text}")
+                return False
         except Exception as e:
             logger.error(f"Task creation error: {e}")
-            return None
+            return False
     
     def wait_for_task_completion(self, max_wait: int = 300) -> bool:
         """Wait for all tasks to complete"""
