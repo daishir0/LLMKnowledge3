@@ -6,7 +6,11 @@ A modern knowledge management system that transforms documents into structured k
 
 - **Document Processing**: Upload and process PDF, PPT, Word, and text files
 - **AI-Powered Analysis**: Generate knowledge using multiple AI providers (OpenAI, Anthropic, Gemini, LMStudio)
-- **Knowledge Matrix**: View and export knowledge in both web interface and Excel format
+- **Knowledge Matrix**: 
+  - Create matrix definitions to combine multiple groups
+  - Real-time web interface display with interactive tables
+  - Excel export with rows as records, columns as prompts, cells as knowledge
+  - Support for plain knowledge text extraction
 - **User Management**: Multi-user support with role-based access control
 - **RESTful API**: Complete API access for all functionality
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
@@ -41,7 +45,7 @@ npm install
 
 4. Set up environment variables:
 ```bash
-cd ../backend
+# Copy the example environment file
 cp .env.example .env
 # Edit .env with your configuration
 ```
@@ -160,8 +164,13 @@ GET /knowledge
 DELETE /knowledge/{id}
 
 # Matrix
-GET /matrix
-GET /matrix/export
+GET /matrix/definitions        # List matrix definitions  
+POST /matrix/definitions       # Create matrix definition
+PUT /matrix/definitions/{id}   # Update matrix definition
+DELETE /matrix/definitions/{id} # Delete matrix definition
+GET /matrix/view/{id}          # View matrix data
+GET /matrix/export/{id}/excel  # Export matrix to Excel
+GET /matrix/legacy             # Legacy matrix endpoint
 
 # Admin
 GET /admin/users
@@ -173,36 +182,20 @@ GET /admin/stats
 
 ### Environment Variables
 
-Create a `.env` file in the backend directory:
+Copy `.env.example` to `.env` and configure as needed:
 
-```env
-# Database
-DATABASE_URL=sqlite:///./knowledge.db
-# DATABASE_URL=postgresql://user:password@localhost/knowledge
-
-# Security
-SECRET_KEY=your-secret-key-here
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# AI Providers
-OPENAI_API_KEY=your-openai-key
-ANTHROPIC_API_KEY=your-anthropic-key
-GEMINI_API_KEY=your-gemini-key
-LMSTUDIO_BASE_URL=http://localhost:1234/v1
-
-# Default AI Model
-DEFAULT_AI_PROVIDER=openai
-DEFAULT_AI_MODEL=gpt-4o-mini
-
-# File Processing
-MARKITDOWN_SERVER_URL=http://localhost:8001
-MAX_FILE_SIZE=50MB
-
-# Admin
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=admin123
+```bash
+cp .env.example .env
 ```
+
+Key configuration options:
+- `DATABASE_URL`: SQLite (default) or PostgreSQL connection string
+- `SECRET_KEY`: JWT signing key (change in production)
+- `OPENAI_API_KEY`: For OpenAI integration (optional)
+- `ADMIN_USERNAME/EMAIL/PASSWORD`: Default admin account credentials
+- `ALLOWED_ORIGINS`: CORS allowed origins for frontend
+
+See `.env.example` for all available configuration options.
 
 ### Database Setup
 
@@ -294,7 +287,10 @@ For questions and support:
 
 ### v3.0.0
 - Complete rewrite in React + FastAPI
-- Added knowledge matrix web interface
+- **NEW: Matrix Definition System** - Create reusable matrix configurations
+- **NEW: Interactive Matrix Display** - Real-time web interface with table view
+- **Enhanced Excel Export** - Proper matrix format (rows=records, columns=prompts, cells=knowledge)
+- **Plain Knowledge Support** - Extract and display original text alongside AI-generated knowledge
 - Improved user management and authentication
 - Enhanced AI provider support
 - Mobile-responsive design

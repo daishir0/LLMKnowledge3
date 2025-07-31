@@ -127,3 +127,57 @@ jspm_packages/
 # Test files
 test_data/
 temp/
+
+# Security and sensitive files
+*.key
+*.pem
+*.p12
+*.pfx
+auth.json
+config.py
+secrets/
+credentials/
+
+# API Keys and tokens
+.env.*
+*.env
+config.json
+secrets.json
+
+# Database files
+knowledge.db
+*.db-shm
+*.db-wal
+
+# Upload directories
+uploads/
+backend/uploads/
+
+# Generated Excel files for testing
+*.xlsx
+directory_security_matrix*.xlsx
+research_papers_matrix*.xlsx
+security_assessment_matrix*.xlsx
+security_matrix_with_plain*.xlsx
+
+# Temporary test directories
+**/llmknowledge_test_*/
+
+# Log files and runtime data
+logs/
+*.log
+backend.log
+frontend.log
+
+# WordPress config (if present)
+tools/post_wordpress/config.py
+
+# SSH keys and certificates
+*.ssh/
+id_rsa*
+id_ecdsa*
+id_ed25519*
+
+# Docker secrets
+docker-compose.override.yml
+docker-compose.prod.yml

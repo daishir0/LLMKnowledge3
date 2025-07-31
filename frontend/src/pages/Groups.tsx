@@ -6,16 +6,21 @@ import { Textarea } from '../components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Badge } from '../components/ui/badge';
-import { groupsAPI, tasksAPI } from '../lib/api';
-import { Group } from '../types';
+import { groupsAPI, tasksAPI, promptsAPI } from '../lib/api';
+import { Group, Prompt } from '../types';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Play, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Play, Users, Settings, Link, Unlink } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 
 const Groups: React.FC = () => {
   const [groups, setGroups] = useState<Group[]>([]);
+  const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [promptDialogOpen, setPromptDialogOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+  const [managingGroup, setManagingGroup] = useState<Group | null>(null);
+  const [selectedPromptId, setSelectedPromptId] = useState<string>('');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -23,6 +28,7 @@ const Groups: React.FC = () => {
 
   useEffect(() => {
     fetchGroups();
+    fetchPrompts();
   }, []);
 
   const fetchGroups = async () => {
@@ -33,6 +39,15 @@ const Groups: React.FC = () => {
       toast.error('Failed to fetch groups');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPrompts = async () => {
+    try {
+      const response = await promptsAPI.list();
+      setPrompts(response.data);
+    } catch (error) {
+      toast.error('Failed to fetch prompts');
     }
   };
 
@@ -76,12 +91,47 @@ const Groups: React.FC = () => {
     }
   };
 
-  const handleExecuteTasks = async (groupId: number) => {
+  const handleExecuteTasks = async (groupId: number, force: boolean = false) => {
     try {
-      await tasksAPI.createBulk(groupId);
-      toast.success('Tasks created successfully');
+      await tasksAPI.createBulk(groupId, force);
+      if (force) {
+        toast.success('Tasks re-executed successfully (forced)');  
+      } else {
+        toast.success('Tasks created successfully');
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.detail || 'Failed to create tasks');
+    }
+  };
+
+  const handleManagePrompts = (group: Group) => {
+    setManagingGroup(group);
+    setSelectedPromptId('');
+    setPromptDialogOpen(true);
+  };
+
+  const handleAddPrompt = async () => {
+    if (!managingGroup || !selectedPromptId) return;
+
+    try {
+      await groupsAPI.addPrompt(managingGroup.id, parseInt(selectedPromptId));
+      toast.success('Prompt added to group successfully');
+      setPromptDialogOpen(false);
+      fetchGroups();
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || 'Failed to add prompt to group');
+    }
+  };
+
+  const handleRemovePrompt = async (groupId: number, promptId: number) => {
+    if (!confirm('Are you sure you want to remove this prompt from the group?')) return;
+
+    try {
+      await groupsAPI.removePrompt(groupId, promptId);
+      toast.success('Prompt removed from group successfully');
+      fetchGroups();
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || 'Failed to remove prompt from group');
     }
   };
 
@@ -191,6 +241,14 @@ const Groups: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="sm"
+                      onClick={() => handleManagePrompts(group)}
+                      title="Manage Prompts"
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleEdit(group)}
                     >
                       <Edit className="h-4 w-4" />
@@ -223,6 +281,15 @@ const Groups: React.FC = () => {
                       <Play className="mr-2 h-4 w-4" />
                       Execute Tasks
                     </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleExecuteTasks(group.id, true)}
+                      title="Force re-execute all tasks (ignore existing results)"
+                    >
+                      <Play className="mr-1 h-3 w-3" />
+                      Force
+                    </Button>
                   </div>
                   
                   <div className="text-sm text-gray-600">
@@ -234,6 +301,51 @@ const Groups: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Prompt Management Dialog */}
+      <Dialog open={promptDialogOpen} onOpenChange={setPromptDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Manage Prompts - {managingGroup?.name}</DialogTitle>
+            <DialogDescription>
+              Add prompts to this group. Prompts will be applied to all records in the group when executing tasks.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="prompt">Select Prompt</Label>
+              <Select value={selectedPromptId} onValueChange={setSelectedPromptId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a prompt to add" />
+                </SelectTrigger>
+                <SelectContent>
+                  {prompts.map((prompt) => (
+                    <SelectItem key={prompt.id} value={prompt.id.toString()}>
+                      {prompt.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setPromptDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleAddPrompt}
+                disabled={!selectedPromptId}
+              >
+                <Link className="mr-2 h-4 w-4" />
+                Add Prompt
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

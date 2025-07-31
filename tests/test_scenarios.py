@@ -183,8 +183,8 @@ class LLMKnowledge3Tester:
     def get_knowledge_matrix(self, group_id: int = None) -> Dict:
         """Get knowledge matrix"""
         try:
-            params = {"group_id": group_id} if group_id else {}
-            response = self.session.get(f"{self.base_url}/matrix", params=params)
+            params = {"group_ids": str(group_id)} if group_id else {}
+            response = self.session.get(f"{self.base_url}/matrix/legacy", params=params)
             if response.status_code == 200:
                 matrix = response.json()
                 logger.info(f"Retrieved knowledge matrix with {matrix['total_count']} items")
@@ -199,8 +199,8 @@ class LLMKnowledge3Tester:
     def export_knowledge_matrix(self, group_id: int = None) -> bool:
         """Export knowledge matrix to Excel"""
         try:
-            params = {"group_id": group_id} if group_id else {}
-            response = self.session.get(f"{self.base_url}/matrix/export", params=params)
+            params = {"group_ids": str(group_id)} if group_id else {}
+            response = self.session.get(f"{self.base_url}/matrix/legacy/export/excel", params=params)
             if response.status_code == 200:
                 filename = f"test_matrix_{int(time.time())}.xlsx"
                 with open(filename, 'wb') as f:
@@ -230,11 +230,11 @@ class LLMKnowledge3Tester:
             return False
         
         prompts = [
-            ("Paper Summary", "Provide a comprehensive summary of this research paper including main contributions, methodology, and key findings.", "Summary"),
-            ("Key Innovations", "Identify and explain the key innovations and novel contributions presented in this paper.", "Analysis"),
-            ("Methodology Analysis", "Analyze the research methodology used in this paper, including experimental design and evaluation metrics.", "Analysis"),
-            ("Future Work", "Extract and summarize the future work and research directions mentioned in this paper.", "Extraction"),
-            ("Technical Limitations", "Identify and discuss the technical limitations and potential weaknesses of the proposed approach.", "Evaluation")
+            ("Paper Summary", "Provide a comprehensive summary of this research paper including main contributions, methodology, and key findings.", "plain_to_knowledge"),
+            ("Key Innovations", "Identify and explain the key innovations and novel contributions presented in this paper.", "plain_to_knowledge"),
+            ("Methodology Analysis", "Analyze the research methodology used in this paper, including experimental design and evaluation metrics.", "plain_to_knowledge"),
+            ("Future Work", "Extract and summarize the future work and research directions mentioned in this paper.", "plain_to_knowledge"),
+            ("Technical Limitations", "Identify and discuss the technical limitations and potential weaknesses of the proposed approach.", "plain_to_knowledge")
         ]
         
         prompt_ids = []
@@ -291,11 +291,11 @@ class LLMKnowledge3Tester:
             return False
         
         prompts = [
-            ("Technical Feasibility", "Rate the technical feasibility of this project on a scale of 1-5 (1=Very Difficult, 5=Very Feasible). Provide reasoning.", "Evaluation"),
-            ("Business Impact", "Rate the potential business impact of this project on a scale of 1-5 (1=Low Impact, 5=High Impact). Explain your assessment.", "Evaluation"),
-            ("Resource Requirements", "Rate the resource requirements for this project on a scale of 1-5 (1=Very High, 5=Very Low). Consider time, budget, and personnel.", "Evaluation"),
-            ("Innovation Level", "Rate the innovation level of this project on a scale of 1-5 (1=Not Innovative, 5=Highly Innovative). Justify your rating.", "Evaluation"),
-            ("Risk Assessment", "Rate the overall risk of this project on a scale of 1-5 (1=Very High Risk, 5=Very Low Risk). Identify key risk factors.", "Evaluation")
+            ("Technical Feasibility", "Rate the technical feasibility of this project on a scale of 1-5 (1=Very Difficult, 5=Very Feasible). Provide reasoning.", "plain_to_knowledge"),
+            ("Business Impact", "Rate the potential business impact of this project on a scale of 1-5 (1=Low Impact, 5=High Impact). Explain your assessment.", "plain_to_knowledge"),
+            ("Resource Requirements", "Rate the resource requirements for this project on a scale of 1-5 (1=Very High, 5=Very Low). Consider time, budget, and personnel.", "plain_to_knowledge"),
+            ("Innovation Level", "Rate the innovation level of this project on a scale of 1-5 (1=Not Innovative, 5=Highly Innovative). Justify your rating.", "plain_to_knowledge"),
+            ("Risk Assessment", "Rate the overall risk of this project on a scale of 1-5 (1=Very High Risk, 5=Very Low Risk). Identify key risk factors.", "plain_to_knowledge")
         ]
         
         prompt_ids = []
@@ -352,11 +352,11 @@ class LLMKnowledge3Tester:
             return False
         
         prompts = [
-            ("SEO Title Generation", "Create an SEO-optimized title for this article that includes relevant keywords and is under 60 characters.", "Transformation"),
-            ("Meta Description", "Write a compelling meta description for this article that is 150-160 characters and includes target keywords.", "Transformation"),
-            ("Keyword Extraction", "Extract the top 10 most relevant keywords and phrases from this article for SEO purposes.", "Extraction"),
-            ("Markdown Conversion", "Convert this article into well-structured Markdown format with proper headings, lists, and formatting.", "Transformation"),
-            ("Content Summary", "Create a brief, engaging summary of this article that could be used as an introduction or social media post.", "Summary")
+            ("SEO Title Generation", "Create an SEO-optimized title for this article that includes relevant keywords and is under 60 characters.", "plain_to_knowledge"),
+            ("Meta Description", "Write a compelling meta description for this article that is 150-160 characters and includes target keywords.", "plain_to_knowledge"),
+            ("Keyword Extraction", "Extract the top 10 most relevant keywords and phrases from this article for SEO purposes.", "plain_to_knowledge"),
+            ("Markdown Conversion", "Convert this article into well-structured Markdown format with proper headings, lists, and formatting.", "plain_to_knowledge"),
+            ("Content Summary", "Create a brief, engaging summary of this article that could be used as an introduction or social media post.", "plain_to_knowledge")
         ]
         
         prompt_ids = []
@@ -413,11 +413,11 @@ class LLMKnowledge3Tester:
             return False
         
         prompts = [
-            ("Personal Information Detection", "Analyze this document and identify any personal information (PII) such as names, addresses, phone numbers, or email addresses. Rate risk as HIGH/MEDIUM/LOW.", "Classification"),
-            ("Confidential Content Assessment", "Determine if this document contains confidential or sensitive business information that should be protected. Provide a security classification.", "Classification"),
-            ("Public Disclosure Readiness", "Assess whether this document is suitable for public disclosure. Identify any content that should be redacted or removed before publication.", "Evaluation"),
-            ("Compliance Risk Analysis", "Evaluate this document for potential compliance risks related to data protection regulations (GDPR, CCPA, etc.).", "Analysis"),
-            ("Security Recommendations", "Provide specific security recommendations for handling, storing, and sharing this document based on its content.", "Analysis")
+            ("Personal Information Detection", "Analyze this document and identify any personal information (PII) such as names, addresses, phone numbers, or email addresses. Rate risk as HIGH/MEDIUM/LOW.", "plain_to_knowledge"),
+            ("Confidential Content Assessment", "Determine if this document contains confidential or sensitive business information that should be protected. Provide a security classification.", "plain_to_knowledge"),
+            ("Public Disclosure Readiness", "Assess whether this document is suitable for public disclosure. Identify any content that should be redacted or removed before publication.", "plain_to_knowledge"),
+            ("Compliance Risk Analysis", "Evaluate this document for potential compliance risks related to data protection regulations (GDPR, CCPA, etc.).", "plain_to_knowledge"),
+            ("Security Recommendations", "Provide specific security recommendations for handling, storing, and sharing this document based on its content.", "plain_to_knowledge")
         ]
         
         prompt_ids = []
@@ -474,11 +474,11 @@ class LLMKnowledge3Tester:
             return False
         
         prompts = [
-            ("Content Quality", "Evaluate the content quality of this essay on a scale of 1-5. Consider accuracy, depth of understanding, and relevance to the topic.", "Evaluation"),
-            ("Writing Clarity", "Rate the writing clarity and organization on a scale of 1-5. Assess structure, flow, grammar, and readability.", "Evaluation"),
-            ("Critical Thinking", "Assess the level of critical thinking demonstrated on a scale of 1-5. Look for analysis, synthesis, and original insights.", "Evaluation"),
-            ("Use of Sources", "Evaluate the use of sources and citations on a scale of 1-5. Consider relevance, credibility, and proper attribution.", "Evaluation"),
-            ("Overall Grade", "Provide an overall grade (A-F) and detailed feedback explaining the strengths and areas for improvement.", "Evaluation")
+            ("Content Quality", "Evaluate the content quality of this essay on a scale of 1-5. Consider accuracy, depth of understanding, and relevance to the topic.", "plain_to_knowledge"),
+            ("Writing Clarity", "Rate the writing clarity and organization on a scale of 1-5. Assess structure, flow, grammar, and readability.", "plain_to_knowledge"),
+            ("Critical Thinking", "Assess the level of critical thinking demonstrated on a scale of 1-5. Look for analysis, synthesis, and original insights.", "plain_to_knowledge"),
+            ("Use of Sources", "Evaluate the use of sources and citations on a scale of 1-5. Consider relevance, credibility, and proper attribution.", "plain_to_knowledge"),
+            ("Overall Grade", "Provide an overall grade (A-F) and detailed feedback explaining the strengths and areas for improvement.", "plain_to_knowledge")
         ]
         
         prompt_ids = []

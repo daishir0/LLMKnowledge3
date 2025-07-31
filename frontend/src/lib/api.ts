@@ -111,11 +111,31 @@ export const tasksAPI = {
 };
 
 export const matrixAPI = {
+  // 既存のレガシーエンドポイント（後方互換性のため）
   get: (groupIds?: string) =>
-    api.get('/matrix/', { params: groupIds ? { group_ids: groupIds } : {} }),
+    api.get('/matrix/legacy', { params: groupIds ? { group_ids: groupIds } : {} }),
   exportExcel: (groupIds?: string) =>
-    api.get('/matrix/export/excel', {
+    api.get('/matrix/legacy/export/excel', {
       params: groupIds ? { group_ids: groupIds } : {},
+      responseType: 'blob',
+    }),
+  
+  // 新しいマトリックス定義機能
+  getDefinitions: () => api.get('/matrix/definitions'),
+  createDefinition: (data: { name: string; description?: string; group_ids: string }) =>
+    api.post('/matrix/definitions', data),
+  updateDefinition: (id: number, data: { name?: string; description?: string; group_ids?: string }) =>
+    api.put(`/matrix/definitions/${id}`, data),
+  deleteDefinition: (id: number) => api.delete(`/matrix/definitions/${id}`),
+  
+  // マトリックス表示・エクスポート
+  viewMatrix: (matrixId: number, includePlainKnowledge?: boolean) =>
+    api.get(`/matrix/view/${matrixId}`, {
+      params: includePlainKnowledge ? { include_plain_knowledge: true } : {}
+    }),
+  exportMatrixExcel: (matrixId: number, includePlainKnowledge?: boolean) =>
+    api.get(`/matrix/export/${matrixId}/excel`, {
+      params: includePlainKnowledge ? { include_plain_knowledge: true } : {},
       responseType: 'blob',
     }),
 };

@@ -127,6 +127,20 @@ class Task(Base):
     prompt = relationship("Prompt")
     result_knowledge = relationship("Knowledge")
 
+class Matrix(Base):
+    __tablename__ = "matrices"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text)
+    group_ids = Column(Text, nullable=False)  # カンマ区切りのグループID
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    deleted = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    user = relationship("User")
+
 class History(Base):
     __tablename__ = "history"
     

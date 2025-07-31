@@ -99,6 +99,25 @@ export interface KnowledgeMatrix {
   total_count: number;
 }
 
+export interface Matrix {
+  id: number;
+  name: string;
+  description?: string;
+  group_ids: string;  // カンマ区切りのグループID文字列
+  user_id: number;
+  deleted: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MatrixExportData {
+  matrix_name: string;
+  records: string[];  // レコードタイトルのリスト
+  prompts: string[];  // プロンプト名のリスト
+  knowledge_data: Record<string, Record<string, string>>;  // record_title -> prompt_name -> answer
+  plain_knowledge?: Record<string, string>;  // record_title -> plain_text
+}
+
 export interface APIResponse {
   success: boolean;
   message: string;

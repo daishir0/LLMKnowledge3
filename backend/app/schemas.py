@@ -189,3 +189,33 @@ class TaskStatus(BaseModel):
     processing_tasks: int
     completed_tasks: int
     failed_tasks: int
+
+class MatrixBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    group_ids: str  # カンマ区切りのグループID文字列
+
+class MatrixCreate(MatrixBase):
+    pass
+
+class MatrixUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    group_ids: Optional[str] = None
+
+class Matrix(MatrixBase):
+    id: int
+    user_id: int
+    deleted: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class MatrixExportData(BaseModel):
+    matrix_name: str
+    records: List[str]  # レコードタイトルのリスト
+    prompts: List[str]  # プロンプト名のリスト
+    knowledge_data: dict  # record_title -> prompt_name -> answer のマッピング
+    plain_knowledge: Optional[dict] = None  # record_title -> plain_text のマッピング

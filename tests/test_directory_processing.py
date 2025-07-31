@@ -92,11 +92,11 @@ class DirectoryProcessingTester:
             logger.info(f"Created group with ID: {group_id}")
             
             prompts = [
-                ("PII Detection", "Scan this file for personally identifiable information (PII) including names, SSNs, addresses, phone numbers, emails. Rate risk as HIGH/MEDIUM/LOW.", "Classification"),
-                ("Confidentiality Level", "Determine the confidentiality level of this file: PUBLIC, INTERNAL, CONFIDENTIAL, or RESTRICTED.", "Classification"),
-                ("External Sharing Safety", "Assess if this file is safe for external sharing. Identify any content that should be redacted.", "Evaluation"),
-                ("Compliance Risk", "Evaluate compliance risks related to data protection regulations (GDPR, CCPA, HIPAA).", "Analysis"),
-                ("Security Classification", "Provide overall security classification and handling recommendations for this file.", "Classification")
+                ("PII Detection", "Scan this file for personally identifiable information (PII) including names, SSNs, addresses, phone numbers, emails. Rate risk as HIGH/MEDIUM/LOW.", "plain_to_knowledge"),
+                ("Confidentiality Level", "Determine the confidentiality level of this file: PUBLIC, INTERNAL, CONFIDENTIAL, or RESTRICTED.", "plain_to_knowledge"),
+                ("External Sharing Safety", "Assess if this file is safe for external sharing. Identify any content that should be redacted.", "plain_to_knowledge"),
+                ("Compliance Risk", "Evaluate compliance risks related to data protection regulations (GDPR, CCPA, HIPAA).", "plain_to_knowledge"),
+                ("Security Classification", "Provide overall security classification and handling recommendations for this file.", "plain_to_knowledge")
             ]
             
             prompt_ids = []
@@ -172,12 +172,12 @@ class DirectoryProcessingTester:
                 logger.error("Directory processing timed out")
                 return False
             
-            response = self.session.get(f"{self.base_url}/matrix", params={"group_id": group_id})
+            response = self.session.get(f"{self.base_url}/matrix/legacy", params={"group_ids": str(group_id)})
             if response.status_code == 200:
                 matrix = response.json()
                 logger.info(f"Generated knowledge matrix with {matrix['total_count']} items")
                 
-                response = self.session.get(f"{self.base_url}/matrix/export/excel", params={"group_id": group_id})
+                response = self.session.get(f"{self.base_url}/matrix/legacy/export/excel", params={"group_ids": str(group_id)})
                 if response.status_code == 200:
                     filename = f"directory_security_scan_{int(time.time())}.xlsx"
                     with open(filename, 'wb') as f:

@@ -117,7 +117,7 @@ const Admin: React.FC = () => {
   const handleExportMatrix = async () => {
     try {
       const response = await adminAPI.exportMatrix(
-        selectedUser ? parseInt(selectedUser) : undefined
+        selectedUser && selectedUser !== "all" ? parseInt(selectedUser) : undefined
       );
       
       const blob = new Blob([response.data], {
@@ -163,7 +163,7 @@ const Admin: React.FC = () => {
               <SelectValue placeholder="Select user for export" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All users</SelectItem>
+              <SelectItem value="all">All users</SelectItem>
               {users.map((user) => (
                 <SelectItem key={user.id} value={user.id.toString()}>
                   {user.username}
