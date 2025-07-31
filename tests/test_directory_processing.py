@@ -225,7 +225,7 @@ def main():
     print("=" * 50)
     
     try:
-        response = requests.get("http://localhost:8000/health")
+        response = requests.get("http://localhost:8000/healthz")
         if response.status_code != 200:
             print("❌ Backend is not running or not healthy")
             return False
