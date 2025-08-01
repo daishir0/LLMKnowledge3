@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { Grid3X3, Download, Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
 
 const Matrix: React.FC = () => {
+  
   // ステート管理
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,9 @@ const Matrix: React.FC = () => {
     try {
       setLoading(true);
       const response = await matrixAPI.viewMatrix(matrixId, includePlainKnowledge);
+      console.log('Matrix data response:', response.data);
+      console.log('includePlainKnowledge:', includePlainKnowledge);
+      console.log('plain_knowledge exists:', !!response.data.plain_knowledge);
       setMatrixData(response.data);
       setSelectedMatrix(matrixId);
     } catch (error) {
@@ -419,10 +423,23 @@ const Matrix: React.FC = () => {
                   <Checkbox
                     id="include-plain"
                     checked={includePlainKnowledge}
-                    onCheckedChange={(checked) => {
+                    onCheckedChange={async (checked) => {
+                      console.log('Checkbox changed:', checked);
                       setIncludePlainKnowledge(!!checked);
                       if (selectedMatrix) {
-                        fetchMatrixData(selectedMatrix);
+                        // ステート更新後にfetchを実行するため、直接パラメータを渡す
+                        try {
+                          setLoading(true);
+                          const response = await matrixAPI.viewMatrix(selectedMatrix, !!checked);
+                          console.log('Matrix data response with checkbox:', response.data);
+                          console.log('includePlainKnowledge after change:', !!checked);
+                          console.log('plain_knowledge exists after change:', !!response.data.plain_knowledge);
+                          setMatrixData(response.data);
+                        } catch (error) {
+                          toast.error('Failed to fetch matrix data');
+                        } finally {
+                          setLoading(false);
+                        }
                       }
                     }}
                   />
@@ -445,35 +462,80 @@ const Matrix: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
+            <div className="overflow-x-auto" style={{ maxHeight: '70vh', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
+              <Table className="matrix-table">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-48">Record Title</TableHead>
-                    {matrixData.prompts.map((prompt) => (
-                      <TableHead key={prompt} className="min-w-64">
-                        {prompt}
+                    <TableHead className="sticky-column bg-white w-48 min-w-48 border-r-2 border-gray-200 font-semibold">
+                      Record Title
+                    </TableHead>
+                    {matrixData.prompts.map((prompt, index) => (
+                      <TableHead 
+                        key={prompt} 
+                        className="bg-white min-w-64 px-4 font-semibold border-r border-gray-100"
+                        style={{
+                          borderRight: index === matrixData.prompts.length - 1 && (!includePlainKnowledge || !matrixData.plain_knowledge) ? 'none' : undefined
+                        }}
+                      >
+                        <div className="truncate" title={prompt}>
+                          {prompt}
+                        </div>
                       </TableHead>
                     ))}
                     {includePlainKnowledge && matrixData.plain_knowledge && (
-                      <TableHead className="min-w-64">元テキスト</TableHead>
+                      <TableHead className="bg-white min-w-64 px-4 font-semibold">
+                        元テキスト
+                      </TableHead>
                     )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {matrixData.records.map((recordTitle) => (
-                    <TableRow key={recordTitle}>
-                      <TableCell className="font-medium">{recordTitle}</TableCell>
-                      {matrixData.prompts.map((prompt) => (
-                        <TableCell key={`${recordTitle}-${prompt}`} className="max-w-sm">
-                          <div className="whitespace-pre-wrap text-sm">
+                  {matrixData.records.map((recordTitle, recordIndex) => (
+                    <TableRow 
+                      key={recordTitle}
+                      className={recordIndex % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'}
+                    >
+                      <TableCell className="sticky-column bg-white font-medium w-48 min-w-48 border-r-2 border-gray-200 px-4">
+                        <div className="truncate" title={recordTitle}>
+                          {recordTitle}
+                        </div>
+                      </TableCell>
+                      {matrixData.prompts.map((prompt, index) => (
+                        <TableCell 
+                          key={`${recordTitle}-${prompt}`} 
+                          className="min-w-64 max-w-64 px-4 border-r border-gray-100 align-top" 
+                          style={{
+                            backgroundColor: recordIndex % 2 === 0 ? '#f9fafb' : '#ffffff',
+                            borderRight: index === matrixData.prompts.length - 1 && (!includePlainKnowledge || !matrixData.plain_knowledge) ? 'none' : undefined
+                          }}
+                        >
+                          <div 
+                            className="cell-content whitespace-pre-wrap text-sm leading-relaxed overflow-hidden"
+                            style={{
+                              maxHeight: '200px',
+                              overflowY: 'auto'
+                            }}
+                            title={matrixData.knowledge_data[recordTitle]?.[prompt] || ''}
+                          >
                             {matrixData.knowledge_data[recordTitle]?.[prompt] || ''}
                           </div>
                         </TableCell>
                       ))}
                       {includePlainKnowledge && matrixData.plain_knowledge && (
-                        <TableCell className="max-w-sm">
-                          <div className="whitespace-pre-wrap text-sm">
+                        <TableCell 
+                          className="min-w-64 max-w-64 px-4 align-top"
+                          style={{
+                            backgroundColor: recordIndex % 2 === 0 ? '#f9fafb' : '#ffffff'
+                          }}
+                        >
+                          <div 
+                            className="cell-content whitespace-pre-wrap text-sm leading-relaxed overflow-hidden"
+                            style={{
+                              maxHeight: '200px',
+                              overflowY: 'auto'
+                            }}
+                            title={matrixData.plain_knowledge[recordTitle] || ''}
+                          >
                             {matrixData.plain_knowledge[recordTitle] || ''}
                           </div>
                         </TableCell>

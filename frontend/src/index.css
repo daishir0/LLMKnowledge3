@@ -25,3 +25,40 @@
   }
 }
 
+/* Matrix Table Styles */
+@layer components {
+  .sticky-column {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    background-color: white !important;
+  }
+  
+  .matrix-table {
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  .matrix-table th,
+  .matrix-table td {
+    border-bottom: 1px solid #e5e7eb;
+    position: relative;
+  }
+  
+  .matrix-table tbody tr:hover {
+    background-color: #f8fafc !important;
+  }
+  
+  .matrix-table tbody tr:hover .sticky-column {
+    background-color: #f8fafc !important;
+  }
+  
+  /* テキスト選択を可能にする */
+  .cell-content {
+    user-select: text;
+    cursor: text;
+  }
+}
+

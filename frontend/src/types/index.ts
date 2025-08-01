@@ -20,6 +20,49 @@ export interface Group {
   deleted: boolean;
   created_at: string;
   updated_at: string;
+  prompts?: Prompt[];
+}
+
+export interface GroupDetailRecord {
+  id: number;
+  title: string;
+  content: string;
+  file_type?: string;
+  created_at: string;
+}
+
+export interface GroupDetailKnowledge {
+  id: number;
+  question: string;
+  answer: string;
+  record_title: string;
+  prompt_name: string;
+  created_at: string;
+}
+
+export interface GroupDetailTask {
+  id: number;
+  type: string;
+  status: string;
+  record_title: string;
+  prompt_name: string;
+  error_message?: string;
+  created_at: string;
+}
+
+export interface GroupDetail {
+  group: Group;
+  prompts: Prompt[];
+  records: GroupDetailRecord[];
+  knowledge: GroupDetailKnowledge[];
+  pending_tasks: GroupDetailTask[];
+  task_stats: {
+    total: number;
+    completed: number;
+    failed: number;
+    processing: number;
+    completion_rate: number;
+  };
 }
 
 export interface Prompt {

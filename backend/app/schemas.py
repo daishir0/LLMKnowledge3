@@ -58,6 +58,30 @@ class Group(GroupBase):
     class Config:
         from_attributes = True
 
+class GroupDetailRecord(BaseModel):
+    id: int
+    title: str
+    content: str
+    file_type: Optional[str]
+    created_at: datetime
+
+class GroupDetailKnowledge(BaseModel):
+    id: int
+    question: str
+    answer: str
+    record_title: str
+    prompt_name: str
+    created_at: datetime
+
+class GroupDetailTask(BaseModel):
+    id: int
+    type: str
+    status: str
+    record_title: str
+    prompt_name: str
+    error_message: Optional[str]
+    created_at: datetime
+
 class PromptBase(BaseModel):
     name: str
     content: str
@@ -80,6 +104,14 @@ class Prompt(PromptBase):
 
     class Config:
         from_attributes = True
+
+class GroupDetail(BaseModel):
+    group: Group
+    prompts: List[Prompt]
+    records: List[GroupDetailRecord]
+    knowledge: List[GroupDetailKnowledge]
+    pending_tasks: List[GroupDetailTask]
+    task_stats: dict
 
 class RecordBase(BaseModel):
     title: str

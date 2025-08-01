@@ -54,6 +54,10 @@ export const groupsAPI = {
     api.post(`/groups/${groupId}/prompts/${promptId}`),
   removePrompt: (groupId: number, promptId: number) =>
     api.delete(`/groups/${groupId}/prompts/${promptId}`),
+  getPrompts: (groupId: number) =>
+    api.get(`/groups/${groupId}/prompts`),
+  getDetail: (groupId: number) =>
+    api.get(`/groups/${groupId}/detail`),
 };
 
 export const promptsAPI = {
