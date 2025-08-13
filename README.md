@@ -87,7 +87,7 @@ The application will be available at:
 - **Authentication**: JWT-based with role management
 - **Database**: SQLite (default) or PostgreSQL
 - **AI Integration**: Multiple provider support
-- **File Processing**: MarkItDown integration
+- **File Processing**: Integrated MarkItDown library for document conversion
 - **API**: RESTful endpoints with OpenAPI documentation
 
 ### Frontend (React + TypeScript)
@@ -194,6 +194,7 @@ Key configuration options:
 - `OPENAI_API_KEY`: For OpenAI integration (optional)
 - `ADMIN_USERNAME/EMAIL/PASSWORD`: Default admin account credentials
 - `ALLOWED_ORIGINS`: CORS allowed origins for frontend
+- `MAX_FILE_SIZE`: Maximum file size for document uploads (default: 50MB)
 
 See `.env.example` for all available configuration options.
 
@@ -291,6 +292,7 @@ For questions and support:
 - **NEW: Interactive Matrix Display** - Real-time web interface with table view
 - **Enhanced Excel Export** - Proper matrix format (rows=records, columns=prompts, cells=knowledge)
 - **Plain Knowledge Support** - Extract and display original text alongside AI-generated knowledge
+- **Integrated MarkItDown Library** - Direct document processing without external server dependency
 - Improved user management and authentication
 - Enhanced AI provider support
 - Mobile-responsive design

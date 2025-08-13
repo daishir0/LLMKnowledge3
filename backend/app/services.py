@@ -229,31 +229,119 @@ class AIService:
 
 class MarkItDownService:
     def __init__(self):
-        self.server_url = os.getenv("MARKITDOWN_SERVER_URL", "http://localhost:8001")
-        self.api_key = os.getenv("MARKITDOWN_API_KEY", "your-api-key")
+        from markitdown import MarkItDown
+        self.markitdown = MarkItDown()
+        self.cache_dir = os.path.join(os.getcwd(), "cache")
+        self.max_file_size = self._parse_file_size(os.getenv("MAX_FILE_SIZE", "50MB"))
+        # キャッシュディレクトリを作成
+        os.makedirs(self.cache_dir, exist_ok=True)
+
+    def _parse_file_size(self, size_str: str) -> int:
+        """Parse file size string (e.g., '50MB') to bytes"""
+        size_str = size_str.upper().strip()
+        if size_str.endswith('MB'):
+            return int(size_str[:-2]) * 1024 * 1024
+        elif size_str.endswith('KB'):
+            return int(size_str[:-2]) * 1024
+        elif size_str.endswith('GB'):
+            return int(size_str[:-2]) * 1024 * 1024 * 1024
+        else:
+            return int(size_str)
+
+    def _calculate_file_hash(self, file_path: str) -> str:
+        """Calculate SHA256 hash of file"""
+        import hashlib
+        sha256_hash = hashlib.sha256()
+        with open(file_path, "rb") as f:
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        return sha256_hash.hexdigest()
+
+    def _get_cached_markdown(self, file_hash: str) -> Optional[str]:
+        """Get cached markdown if exists"""
+        cache_path = os.path.join(self.cache_dir, f"{file_hash}.md")
+        if os.path.exists(cache_path):
+            try:
+                with open(cache_path, 'r', encoding='utf-8') as f:
+                    return f.read()
+            except Exception:
+                pass
+        return None
+
+    def _save_to_cache(self, file_hash: str, markdown_content: str) -> None:
+        """Save markdown to cache"""
+        try:
+            cache_path = os.path.join(self.cache_dir, f"{file_hash}.md")
+            with open(cache_path, 'w', encoding='utf-8') as f:
+                f.write(markdown_content)
+        except Exception:
+            pass  # Cache failure shouldn't stop the process
+
+    def _is_allowed_file(self, filename: str) -> bool:
+        """Check if file extension is allowed"""
+        allowed_extensions = {
+            'doc', 'docx', 'pdf', 'txt', 'rtf',
+            'odt', 'ods', 'odp', 'odg', 'odf',
+            'htm', 'html', 'xml', 'ppt', 'pptx',
+            'xls', 'xlsx', 'md'
+        }
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
     async def convert_file(self, file_path: str) -> str:
-        """Convert file to markdown using MarkItDown server"""
+        """Convert file to markdown using MarkItDown library"""
         try:
-            async with httpx.AsyncClient() as client:
-                with open(file_path, 'rb') as f:
-                    files = {'file': f}
-                    headers = {'X-API-Key': self.api_key}
-                    response = await client.post(
-                        f"{self.server_url}/convert",
-                        files=files,
-                        headers=headers,
-                        timeout=120.0
-                    )
-                    response.raise_for_status()
-                    result = response.json()
-                    return result.get("markdown", "")
-        except Exception as e:
+            # Check if file exists
+            if not os.path.exists(file_path):
+                raise Exception("File not found")
+
+            # Check file size
+            file_size = os.path.getsize(file_path)
+            if file_size > self.max_file_size:
+                print(f"Warning: File size ({file_size} bytes) exceeds limit ({self.max_file_size} bytes)")
+
+            # Check file extension
+            filename = os.path.basename(file_path)
+            if not self._is_allowed_file(filename):
+                raise Exception(f"File type not supported: {filename}")
+
+            # Calculate file hash for caching
+            file_hash = self._calculate_file_hash(file_path)
+            
+            # Check cache first
+            cached_content = self._get_cached_markdown(file_hash)
+            if cached_content:
+                return cached_content
+
+            # Convert file using MarkItDown
             try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    return f.read()
-            except:
-                raise Exception(f"Failed to convert file: {str(e)}")
+                result = self.markitdown.convert_local(
+                    file_path,
+                    pdf_options={
+                        'check_extractable': False,
+                        'ignore_metadata_extraction_restrictions': True,
+                        'extract_all_pages': True,
+                        'max_pages': 9999,
+                    }
+                )
+                markdown_content = result.text_content
+                
+                # Save to cache
+                self._save_to_cache(file_hash, markdown_content)
+                
+                return markdown_content
+                
+            except Exception as conversion_error:
+                # Fallback: try to read as text file
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        self._save_to_cache(file_hash, content)
+                        return content
+                except Exception:
+                    raise Exception(f"Failed to convert file: {str(conversion_error)}")
+                    
+        except Exception as e:
+            raise Exception(f"Failed to convert file: {str(e)}")
 
 class TaskService:
     def __init__(self, db: Session):
