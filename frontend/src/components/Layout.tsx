@@ -44,7 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Groups', href: '/groups', icon: Users },
     { name: 'Prompts', href: '/prompts', icon: FileText },
-    { name: 'Records', href: '/records', icon: Database },
+    { name: 'Plain Knowledge', href: '/records', icon: Database },
     { name: 'Knowledge', href: '/knowledge', icon: Brain },
     { name: 'Tasks', href: '/tasks', icon: CheckSquare },
     { name: 'Matrix', href: '/matrix', icon: Grid3X3 },
@@ -62,7 +62,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const Sidebar = ({ mobile = false }) => (
     <div className={`flex flex-col h-full ${mobile ? 'w-full' : 'w-64'} bg-gray-900 text-white`}>
       <div className="flex items-center justify-center h-16 px-4 bg-gray-800">
-        <h1 className="text-xl font-bold">LLMKnowledge3</h1>
+        <Link to="/" className="text-xl font-bold hover:text-gray-300 transition-colors">
+          LLMKnowledge3
+        </Link>
       </div>
       <nav className="flex-1 px-4 py-6 space-y-2">
         {navigation.map((item) => {
@@ -121,7 +123,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </SheetTrigger>
               </Sheet>
               <h2 className="text-lg font-semibold text-gray-900 capitalize">
-                {location.pathname.slice(1) || 'Dashboard'}
+                {location.pathname === '/' || location.pathname === '/home' ? 'Home' : location.pathname.slice(1)}
               </h2>
             </div>
 

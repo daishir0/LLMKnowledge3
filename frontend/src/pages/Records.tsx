@@ -45,7 +45,7 @@ const Records: React.FC = () => {
       });
       setRecords(response.data);
     } catch (error) {
-      toast.error('Failed to fetch records');
+      toast.error('Failed to fetch plain knowledge');
     } finally {
       setLoading(false);
     }
@@ -78,17 +78,17 @@ const Records: React.FC = () => {
 
       if (editingRecord) {
         await recordsAPI.update(editingRecord.id, data);
-        toast.success('Record updated successfully');
+        toast.success('Plain knowledge updated successfully');
       } else {
         await recordsAPI.create(data);
-        toast.success('Record created successfully');
+        toast.success('Plain knowledge created successfully');
       }
       setDialogOpen(false);
       setEditingRecord(null);
       setFormData({ title: '', content: '', group_id: '' });
       fetchRecords();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to save record');
+      toast.error(error.response?.data?.detail || 'Failed to save plain knowledge');
     }
   };
 
@@ -126,14 +126,14 @@ const Records: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this record?')) return;
+    if (!confirm('Are you sure you want to delete this plain knowledge?')) return;
     
     try {
       await recordsAPI.delete(id);
-      toast.success('Record deleted successfully');
+      toast.success('Plain knowledge deleted successfully');
       fetchRecords();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Failed to delete record');
+      toast.error(error.response?.data?.detail || 'Failed to delete plain knowledge');
     }
   };
 
@@ -160,8 +160,8 @@ const Records: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Records</h1>
-          <p className="text-gray-600">Manage your documents and data records</p>
+          <h1 className="text-2xl font-bold text-gray-900">Plain Knowledge</h1>
+          <p className="text-gray-600">Manage your documents and plain knowledge</p>
         </div>
         <div className="flex space-x-2">
           <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
@@ -175,7 +175,7 @@ const Records: React.FC = () => {
               <DialogHeader>
                 <DialogTitle>Upload File</DialogTitle>
                 <DialogDescription>
-                  Upload a document to be processed and converted to a record.
+                  Upload a document to be processed and converted to plain knowledge.
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleUpload} className="space-y-4">
@@ -222,18 +222,18 @@ const Records: React.FC = () => {
             <DialogTrigger asChild>
               <Button onClick={openCreateDialog}>
                 <Plus className="mr-2 h-4 w-4" />
-                Create Record
+                Create Plain Knowledge
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>
-                  {editingRecord ? 'Edit Record' : 'Create New Record'}
+                  {editingRecord ? 'Edit Plain Knowledge' : 'Create New Plain Knowledge'}
                 </DialogTitle>
                 <DialogDescription>
                   {editingRecord 
-                    ? 'Update the record information below.'
-                    : 'Create a new record manually.'
+                    ? 'Update the plain knowledge information below.'
+                    : 'Create new plain knowledge manually.'
                   }
                 </DialogDescription>
               </DialogHeader>
@@ -245,7 +245,7 @@ const Records: React.FC = () => {
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     required
-                    placeholder="Enter record title"
+                    placeholder="Enter plain knowledge title"
                   />
                 </div>
                 <div>
@@ -274,7 +274,7 @@ const Records: React.FC = () => {
                     value={formData.content}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                     required
-                    placeholder="Enter record content..."
+                    placeholder="Enter plain knowledge content..."
                     rows={8}
                   />
                 </div>
@@ -297,7 +297,7 @@ const Records: React.FC = () => {
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Search records..."
+            placeholder="Search plain knowledge..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -323,19 +323,19 @@ const Records: React.FC = () => {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <FileText className="h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchTerm || selectedGroup ? 'No records match your search' : 'No records yet'}
+              {searchTerm || selectedGroup ? 'No plain knowledge matches your search' : 'No plain knowledge yet'}
             </h3>
             <p className="text-gray-600 text-center mb-4">
               {searchTerm || selectedGroup
                 ? 'Try adjusting your search terms or filters.'
-                : 'Upload files or create records manually to get started.'
+                : 'Upload files or create plain knowledge manually to get started.'
               }
             </p>
             {!searchTerm && !selectedGroup && (
               <div className="flex space-x-2">
                 <Button onClick={openCreateDialog}>
                   <Plus className="mr-2 h-4 w-4" />
-                  Create Record
+                  Create Plain Knowledge
                 </Button>
                 <Button variant="outline" onClick={() => setUploadDialogOpen(true)}>
                   <Upload className="mr-2 h-4 w-4" />

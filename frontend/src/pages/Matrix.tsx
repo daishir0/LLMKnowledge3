@@ -44,8 +44,10 @@ const Matrix: React.FC = () => {
   const fetchMatrixDefinitions = async () => {
     try {
       const response = await matrixAPI.getDefinitions();
+      console.log('Matrix definitions response:', response.data);
       setMatrixDefinitions(response.data);
     } catch (error) {
+      console.error('Error fetching matrix definitions:', error);
       toast.error('Failed to fetch matrix definitions');
     } finally {
       setLoading(false);
@@ -458,7 +460,7 @@ const Matrix: React.FC = () => {
               </div>
             </CardTitle>
             <CardDescription>
-              Records: {matrixData.records.length}, Prompts: {matrixData.prompts.length}
+              Plain Knowledge: {matrixData.records.length}, Prompts: {matrixData.prompts.length}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -467,7 +469,7 @@ const Matrix: React.FC = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="sticky-column bg-white w-48 min-w-48 border-r-2 border-gray-200 font-semibold">
-                      Record Title
+                      Plain Knowledge Title
                     </TableHead>
                     {matrixData.prompts.map((prompt, index) => (
                       <TableHead 

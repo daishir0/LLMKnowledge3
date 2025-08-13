@@ -23,7 +23,7 @@ const Login: React.FC = () => {
     try {
       await login(username, password);
       toast.success('Login successful!');
-      navigate('/dashboard');
+      navigate('/');
     } catch (error: any) {
       toast.error(error.response?.data?.detail || 'Login failed');
     } finally {

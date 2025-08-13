@@ -87,7 +87,7 @@ const KnowledgePage: React.FC = () => {
 
   const getRecordTitle = (recordId: number) => {
     const record = records.find(r => r.id === recordId);
-    return record?.title || 'Unknown Record';
+    return record?.title || 'Unknown Plain Knowledge';
   };
 
   const getPromptName = (promptId: number) => {
@@ -108,7 +108,7 @@ const KnowledgePage: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Knowledge</h1>
-          <p className="text-gray-600">AI-generated knowledge from your records and prompts</p>
+          <p className="text-gray-600">AI-generated knowledge from your plain knowledge and prompts</p>
         </div>
       </div>
 
@@ -125,10 +125,10 @@ const KnowledgePage: React.FC = () => {
         </div>
         <Select value={selectedRecord} onValueChange={setSelectedRecord}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="All records" />
+            <SelectValue placeholder="All plain knowledge" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All records</SelectItem>
+            <SelectItem value="all">All plain knowledge</SelectItem>
             {records.map((record) => (
               <SelectItem key={record.id} value={record.id.toString()}>
                 {record.title}
@@ -164,7 +164,7 @@ const KnowledgePage: React.FC = () => {
             <p className="text-gray-600 text-center mb-4">
               {searchTerm || (selectedRecord && selectedRecord !== 'all') || (selectedPrompt && selectedPrompt !== 'all')
                 ? 'Try adjusting your search terms or filters.'
-                : 'Create groups with records and prompts, then execute tasks to generate knowledge.'
+                : 'Create groups with plain knowledge and prompts, then execute tasks to generate knowledge.'
               }
             </p>
           </CardContent>

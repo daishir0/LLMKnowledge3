@@ -5,6 +5,7 @@ import { Toaster } from 'sonner';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Groups from './pages/Groups';
 import Prompts from './pages/Prompts';
@@ -30,7 +31,8 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <Routes>
-                      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                      <Route path="/" element={<Navigate to="/home" replace />} />
+                      <Route path="/home" element={<Home />} />
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/groups" element={<Groups />} />
                       <Route path="/prompts" element={<Prompts />} />

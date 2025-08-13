@@ -213,7 +213,7 @@ const Groups: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Groups</h1>
-          <p className="text-gray-600">Organize your records into groups for processing</p>
+          <p className="text-gray-600">Organize your plain knowledge into groups for processing</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -230,7 +230,7 @@ const Groups: React.FC = () => {
               <DialogDescription>
                 {editingGroup 
                   ? 'Update the group information below.'
-                  : 'Create a new group to organize your records.'
+                  : 'Create a new group to organize your plain knowledge.'
                 }
               </DialogDescription>
             </DialogHeader>
@@ -274,7 +274,7 @@ const Groups: React.FC = () => {
             <Users className="h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No groups yet</h3>
             <p className="text-gray-600 text-center mb-4">
-              Create your first group to start organizing your records and generating knowledge.
+              Create your first group to start organizing your plain knowledge and generating knowledge.
             </p>
             <Button onClick={openCreateDialog}>
               <Plus className="mr-2 h-4 w-4" />
@@ -382,7 +382,7 @@ const Groups: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Manage Prompts - {managingGroup?.name}</DialogTitle>
             <DialogDescription>
-              Add or remove prompts for this group. Prompts will be applied to all records in the group when executing tasks.
+              Add or remove prompts for this group. Prompts will be applied to all plain knowledge in the group when executing tasks.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -462,7 +462,7 @@ const Groups: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Group Details - {groupDetail?.group.name}</DialogTitle>
             <DialogDescription>
-              Comprehensive view of records, generated knowledge, and task status for this group.
+              Comprehensive view of plain knowledge, generated knowledge, and task status for this group.
             </DialogDescription>
           </DialogHeader>
           
@@ -514,7 +514,7 @@ const Groups: React.FC = () => {
                     Associated Prompts ({groupDetail.prompts.length} prompts)
                   </CardTitle>
                   <p className="text-sm text-gray-600">
-                    These prompts will be applied to all records in this group during task execution
+                    These prompts will be applied to all plain knowledge in this group during task execution
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -561,12 +561,12 @@ const Groups: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {/* Plain Knowledge (Records) */}
+              {/* Plain Knowledge */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    Plain Knowledge ({groupDetail.records.length} records)
+                    Plain Knowledge ({groupDetail.records.length} items)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -591,7 +591,7 @@ const Groups: React.FC = () => {
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500 text-center py-4">No records found</p>
+                      <p className="text-gray-500 text-center py-4">No plain knowledge found</p>
                     )}
                   </div>
                 </CardContent>

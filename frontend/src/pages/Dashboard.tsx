@@ -57,10 +57,10 @@ const Dashboard: React.FC = () => {
       href: '/groups',
     },
     {
-      title: 'Records',
+      title: 'Plain Knowledge',
       value: stats.records,
       icon: FileText,
-      description: 'Total records',
+      description: 'Total plain knowledge',
       href: '/records',
     },
     {
